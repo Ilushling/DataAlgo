@@ -1,19 +1,19 @@
-class Edge {
-    constructor(data) {
-        this.data = data;
+export class Edge {
+    constructor(value) {
+        this.value = value;
     }
 
     /**
-     * @returns {number|string|object}
+     * @returns {any}
      */
-    getData() {
-        return this.data;
+    getValue() {
+        return this.value;
     }
 
     /**
-     * @param {number|string|object} data 
+     * @param {any} value 
      */
-    setData(data) {
-        this.data = data;
+    setValue(value) {
+        this.value = value;
     }
 }

@@ -1,7 +1,7 @@
-class Node {
-    constructor(id, data) {
+export class Node {
+    constructor(id, value) {
         this.id = id;
-        this.data = data;
+        this.value = value;
     }
 
     /**
@@ -12,16 +12,16 @@ class Node {
     }
 
     /**
-     * @returns {number|string|object}
+     * @returns {any}
      */
-    getData() {
-        return this.data;
+    getValue() {
+        return this.value;
     }
 
     /**
-     * @param {number|string|object} data 
+     * @param {any} value 
      */
-    setData(data) {
-        this.data = data;
+    setValue(value) {
+        this.value = value;
     }
 }

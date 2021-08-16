@@ -1,55 +1,50 @@
-class Graph {
-    constructor(nodes = [], edges = []) {
+import { Node } from './Node.js';
+import { Edge } from './Edge.js';
+
+export class Graph {
+    constructor(nodes = new Map(), edges = new Map()) {
         this.nodes = nodes;
         this.edges = edges;
+        this.nodesCount = this.nodes.size;
     }
 
     /**
      * @param {number|string} nodeId 
-     * @param {number|string|object} data 
+     * @param {number|string|object} value 
      * @returns {Node} 
      */
-    addNode(nodeId, data) {
-        const node = this.hasNode(nodeId);
-        if (node) {
+    addNode(nodeId, value) {
+        if (this.hasNode(nodeId)) {
             throw new Error('Node already exists');
         }
 
-        this.nodes[nodeId] = new Node(nodeId, data);
+        const node = new Node(nodeId, value);
+        this.nodes.set(nodeId, node);
 
         this.nodesCount++;
 
-        return this.getNode(nodeId);
+        return node;
     }
 
     /**
      * @param {number|string} sourceNodeId 
      * @param {number|string} targetNodeId 
-     * @param {number|string|object} data 
+     * @param {number|string|object} value 
      * @param {boolean} undirected 
      * @returns {object} edges
      */
-    addEdge(sourceNodeId, targetNodeId, data, undirected) {
-        const sourceNode = this.hasNode(sourceNodeId);
-        if (!sourceNode) {
+    addEdge(sourceNodeId, targetNodeId, value, undirected = false) {
+        if (!this.hasNode(sourceNodeId)) {
             throw new Error('sourceNode is not exists');
         }
-        const targetNode = this.hasNode(targetNodeId);
-        if (!targetNode) {
+        if (!this.hasNode(targetNodeId)) {
             throw new Error('targetNode is not exists');
         }
 
-        if (!this.edges[sourceNodeId]) {
-            this.edges[sourceNodeId] = [];
-        }
-        if (!this.edges[targetNodeId]) {
-            this.edges[targetNodeId] = [];
-        }
-
-        this.edges[sourceNodeId][targetNodeId] = new Edge(data);
+        this.setEdge(sourceNodeId, targetNodeId, new Edge(value));
         this.edgesCount++;
         if (undirected) {
-            this.edges[targetNodeId][targetNodeId] = new Edge(data);
+            this.setEdge(targetNodeId, sourceNodeId, new Edge(value));
             this.edgesCount++;
             return [this.getEdge(sourceNodeId, targetNodeId), this.getEdge(targetNodeId, sourceNodeId)];
         }
@@ -62,7 +57,7 @@ class Graph {
      * @returns {Node}
      */
     getNode(nodeId) {
-        return this.nodes[nodeId];
+        return this.nodes.get(nodeId);
     }
 
     /**
@@ -78,7 +73,7 @@ class Graph {
      * @returns {Edge}
      */
     getEdge(sourceNodeId, targetNodeId) {
-        return this.edges[sourceNodeId][targetNodeId];
+        return this.getEdges(sourceNodeId).get(targetNodeId);
     }
 
     /**
@@ -86,7 +81,7 @@ class Graph {
      * @returns {object} edges
      */
     getEdges(nodeId) {
-        return this.edges[nodeId];
+        return this.edges.get(nodeId);
     }
 
     /**
@@ -101,7 +96,7 @@ class Graph {
      * @returns {boolean}
      */
     hasNode(nodeId) {
-        return !!this.getNode(nodeId);
+        return this.nodes.has(nodeId);
     }
 
     /**
@@ -110,7 +105,15 @@ class Graph {
      * @returns {boolean}
      */
     hasEdge(sourceNodeId, targetNodeId) {
-        return this.hasNode(sourceNodeId) && this.hasNode(targetNodeId) && this.getEdge(sourceNodeId, targetNodeId);
+        return this.getEdges(sourceNodeId).has(targetNodeId);
+    }
+
+    /**
+     * @param {number|string} nodeId 
+     * @returns {boolean}
+     */
+    hasEdges(nodeId) {
+        return this.edges.has(nodeId);
     }
 
     /**
@@ -129,32 +132,49 @@ class Graph {
 
     /**
      * @param {number|string} nodeId 
-     * @param {number|string|object} data 
+     * @param {object} value 
      */
-    setNode(nodeId, data) {
-        this.getNode(nodeId).setData(data);
-    }
-
-    /**
-     * @param {number|string} sourceNodeId 
-     * @param {number|string} targetNodeId 
-     * @param {number|string|object} data 
-     */
-    setEdge(sourceNodeId, targetNodeId, data) {
-        this.getEdge(sourceNodeId, targetNodeId).setData(data);
+    setNode(nodeId, value) {
+        this.nodes.set(nodeId, value);
     }
 
     /**
      * @param {object} nodes 
      */
-    setNodes(nodes) {
+    setAllNodes(nodes) {
         this.nodes = nodes;
+    }
+
+    /**
+     * @param {number|string} sourceNodeId 
+     * @param {number|string} targetNodeId 
+     * @param {object} edge 
+     */
+    setEdge(sourceNodeId, targetNodeId, edge) {
+        if (!this.hasEdges(sourceNodeId)) {
+            this.setEdges(sourceNodeId, new Map());
+        }
+        this.getEdges(sourceNodeId).set(targetNodeId, edge);
+    }
+
+    /**
+     * @param {number|string} nodeId
+     * @param {object} edges
+     */
+    setEdges(nodeId, edges) {
+        if (this.hasEdges(nodeId)) {
+            const edgesOld = this.getEdges(nodeId);
+            this.edgesCount -= edgesOld.size;
+        }
+
+        this.edges.set(nodeId, edges);
+        this.edgesCount += edges.size;
     }
 
     /**
      * @param {object} edges 
      */
-    setEdges(edges) {
+    setAllEdges(edges) {
         this.edges = edges;
     }
 
@@ -168,7 +188,7 @@ class Graph {
             return false;
         }
 
-        delete this.edges[sourceNodeId][targetNodeId];
+        this.getEdges(sourceNodeId).delete(targetNodeId);
         this.edgesCount--;
 
         return true;
@@ -178,14 +198,21 @@ class Graph {
      * @param {number|string} nodeId 
      */
     removeEdges(nodeId) {
+        if (!this.hasEdges(nodeId)) {
+            return false;
+        }
+
         const edges = this.getEdges(nodeId);
-        this.edgesCount -= edges.length;
-        edges.forEach(edge => delete edge[nodeId]);
+        this.edgesCount -= edges.size;
+
+        edges.clear();
+
+        return true;
     }
 
     clear() {
-        this.nodes = [];
-        this.edges = [];
+        this.nodes.clear();
+        this.edges.clear();
         this.edgesCount = 0;
     }
 }
