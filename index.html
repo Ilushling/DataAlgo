@@ -5,15 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Graph</title>
     <script src="src/Graph.js" type="module"></script>
+    <script src="src/Tree/Tree.js" type="module"></script>
     <script src="tests/Graph.js" type="module"></script>
+    <script src="tests/Tree.js" type="module"></script>
 </head>
+<style>
+    .circle {
+        width: 30px;
+        height: 30px;
+        background-color: #ffffff;
+        color: black;
+        text-align: center;
+    }
+</style>
 <body style="background: black; color: white; margin: 0;">
     <div id="wrapper">
         <div id="graphWrapper">
             <canvas id="graphCanvas" style="display: block;"></canvas>
         </div>
+        <div id="treeWrapper" style="display: flex; justify-content: center;">
+
+        </div>
     </div>
 </body>
-<script>
+<script type="module">
+    import {Tree} from './src/Tree/Tree.js';
+    const treeNode = new Tree();
+    
+    treeNode.add(8);
+    treeNode.add(3);
+    treeNode.add(10);
+    treeNode.add(1);
+    treeNode.add(6);
+    treeNode.add(14);
+    treeNode.add(4);
+    treeNode.add(7);
+    treeNode.add(13);
+    treeNode.add(5);
 </script>
 </html>

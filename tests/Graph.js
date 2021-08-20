@@ -54,4 +54,4 @@ if (!graph.removeEdges(2)) {
     throw new Error('Error removeEdge');
 }
 
-console.log('Tests done');
+console.log('Graph test done');

@@ -1,5 +1,5 @@
-import { Node } from './Node.js';
-import { Edge } from './Edge.js';
+import {Node} from './Node.js';
+import {Edge} from './Edge.js';
 
 export class Graph {
     constructor(nodes = new Map(), edges = new Map()) {
