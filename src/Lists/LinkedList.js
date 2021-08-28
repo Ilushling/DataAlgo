@@ -14,7 +14,7 @@ export class LinkedList {
 
         this.head = newNode;
 
-        if (this.tail === null) {
+        if (this.tail == null) {
             this.tail = newNode;
         }
     }
@@ -24,7 +24,7 @@ export class LinkedList {
 
         this.count++;
 
-        if (this.head === null || this.tail === null) {
+        if (this.head == null || this.tail == null) {
             this.head = newNode;
             this.tail = newNode;
 
@@ -37,7 +37,7 @@ export class LinkedList {
     }
 
     find(value) {
-        if (this.head === null) {
+        if (this.head == null) {
             return null;
         }
 
@@ -55,7 +55,7 @@ export class LinkedList {
     }
 
     deleteTail() {
-        if (this.tail === null) {
+        if (this.tail == null) {
             return null;
         }
 
@@ -63,7 +63,7 @@ export class LinkedList {
 
         const deletedTail = this.tail;
 
-        if (this.count === 1) {
+        if (this.count == 1) {
             this.head = null;
             this.tail = null;
 
@@ -72,7 +72,7 @@ export class LinkedList {
 
         let currentNode = this.head;
         while (currentNode.next) {
-            if (currentNode.next.next === null) {
+            if (currentNode.next.next == null) {
                 currentNode.next = null;
             } else {
                 currentNode = currentNode.next;
@@ -85,7 +85,7 @@ export class LinkedList {
     }
 
     deleteHead() {
-        if (this.head === null) {
+        if (this.head == null) {
             return null;
         }
 

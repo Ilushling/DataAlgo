@@ -18,7 +18,7 @@ export class DoublyLinkedList {
 
         this.head = newNode;
 
-        if (this.tail === null) {
+        if (this.tail == null) {
             this.tail = newNode;
         }
     }
@@ -36,13 +36,13 @@ export class DoublyLinkedList {
 
         this.tail = newNode;
 
-        if (this.head === null) {
+        if (this.head == null) {
             this.head = newNode;
         }
     }
 
     find(value) {
-        if (this.head === null) {
+        if (this.head == null) {
             return null;
         }
 
@@ -60,7 +60,7 @@ export class DoublyLinkedList {
     }
 
     deleteTail() {
-        if (this.tail === null) {
+        if (this.tail == null) {
             return null;
         }
 
@@ -80,7 +80,7 @@ export class DoublyLinkedList {
     }
 
     deleteHead() {
-        if (this.head === null) {
+        if (this.head == null) {
             return null;
         }
 

@@ -5,7 +5,7 @@ const binarySearchTree = new BinarySearchTree();
 // Add and remove root
 binarySearchTree.insert(9);
 binarySearchTree.remove(9);
-if (binarySearchTree.find(9) !== null) {
+if (binarySearchTree.find(9) != null) {
     throw new Error('Error remove node');
 }
 
@@ -34,7 +34,7 @@ binarySearchTree.insert(5);
 
 // Remove node with no childrens
 binarySearchTree.remove(1);
-if (binarySearchTree.find(3).left !== null) {
+if (binarySearchTree.find(3).left != null) {
     throw new Error('Error remove with no childrens');
 }
 
@@ -68,11 +68,11 @@ if (binarySearchTree.find(7).left.key !== 5) {
 }
 
 if (binarySearchTree.min().key !== 3) {
-    throw new Error('Error findMin');
+    throw new Error('Error min');
 }
 
 if (binarySearchTree.max().key !== 13) {
-    throw new Error('Error findMax');
+    throw new Error('Error max');
 }
 
 if (binarySearchTree.size !== 7) {
