@@ -1,382 +1,491 @@
-import { BinarySearchTreeNode } from './BinarySearchTreeNode.js';
+import BinarySearchTreeNode from './BinarySearchTreeNode.js';
 
-export class BinarySearchTree {
-    constructor() {
-        this.root = null;
-        this.size = 0;
+/**
+ * @typedef {object} BinarySearchTreeProperties
+ * @property {BinarySearchTreeNode=} root
+ * @property {number=} size
+ * 
+ * @typedef {BinarySearchTreeProperties} BinarySearchTreeParams
+ */
+export default class BinarySearchTree {
+  #root;
+  #size;
+
+  /** @param {BinarySearchTreeParams} params */
+  constructor({
+    root,
+    size = 0
+  } = {}) {
+    this.#root = root;
+    this.#size = size;
+  }
+
+  getRoot() {
+    return this.#root;
+  }
+
+  /**
+   * @param {BinarySearchTreeNode} node
+   */
+  setRoot(node) {
+    this.#root = node;
+  }
+
+  #clearRoot() {
+    this.#root = undefined;
+  }
+
+
+  getSize() {
+    return this.#size;
+  }
+
+  #incrementSize() {
+    this.#size++;
+  }
+
+  #decrementSize() {
+    this.#size--;
+  }
+
+  #clearSize() {
+    this.#size = 0;
+  }
+
+
+  /**
+   * @param {number} key
+   * @param {unknown=} value
+   * @param {BinarySearchTreeNode=} current
+   */
+  insert(key, value, current = this.getRoot()) {
+    if (current == null) {
+      /*
+        (X)
+      */
+
+      const newNode = new BinarySearchTreeNode({ key, value });
+
+      this.#incrementSize();
+
+      this.setRoot(newNode);
+
+      return newNode;
     }
 
-    /**
-     * @param {number} key 
-     * @param {any} value 
-     * @param {object} currentNode 
-     * @returns {object} newNode
-     */
-    insert(key, value, currentNode = this.root) {
-        const newNode = new BinarySearchTreeNode(key, value);
-        this.size++;
+    const newNode = new BinarySearchTreeNode({ key, value });
 
-        if (this.root == null) {
-            /*
-                (X)
-            */
-            this.root = newNode;
-            return newNode;
+    this.#incrementSize();
+
+    let parent = undefined;
+
+    // Without function recursive calls for better perfomance
+    while (current != null) {
+      const currentKey = current.getKey();
+
+      if (key < currentKey) {
+        const left = current.getLeft();
+
+        if (left == null) {
+          /*
+               A
+              /
+            (X)
+          */
+          current.setLeft(newNode);
+
+          newNode.setParent(current);
+
+          break;
         }
 
-        let parentNode = null;
-        // Without function recursive calls for better perfomance
-        while (true) {
-            currentNode.parent = parentNode;
+        parent = current;
+        current = left;
+      } else if (key > currentKey) {
+        const right = current.getRight();
 
-            if (key < currentNode.key) {
-                if (currentNode.left == null) {
-                    /*
-                           A
-                          /
-                        (X)
-                    */
-                    currentNode.left = newNode;
-                    break;
-                }
+        if (right == null) {
+          /*
+            A
+             \
+             (X)
+          */
+          current.setRight(newNode);
 
-                parentNode = currentNode;
-                currentNode = currentNode.left;
-            } else if (key > currentNode.key) {
-                if (currentNode.right == null) {
-                    /*
-                        A
-                         \
-                         (X)
-                    */
-                    currentNode.right = newNode;
-                    break;
-                }
+          newNode.setParent(current);
 
-                parentNode = currentNode;
-                currentNode = currentNode.right;
-            } else {
-                // key === currentNode.key
-                /*
-                    3 ways to handle duplication key:
-                    1) Ignore insert
-                    2) (only for keys, without values) add counter to node of duplications
-                    3) Add siblings to node by LinkedList
-                */
-                // Increment duplicate counter
-                currentNode.count++;
-
-                // 3 way - Add sibling duplicate
-                /*
-                    (X) - A
-                */
-                currentNode.siblings.append(newNode);
-                break;
-            }
+          break;
         }
-        newNode.parent = currentNode;
 
-        return newNode;
+        parent = current;
+        current = right;
+      } else {
+        // key === currentKey
+
+        /*
+          3 ways to handle duplication key:
+          1) Ignore insert
+          2) (only for keys, without values) add counter to node of duplications
+          3) Add siblings to node by LinkedList
+        */
+
+        // 2 way - Increment duplicate counter
+        current.incrementCount();
+
+        // 3 way - Add duplicate sibling
+        /*
+          (X) - A
+        */
+        const siblings = current.getSiblings();
+
+        siblings.append(newNode);
+
+        if (parent != null) {
+          newNode.setParent(parent);
+        }
+
+        break;
+      }
     }
 
-    /**
-     * @param {object} currentNode
-     * @returns {object} min
-     */
-    min(currentNode = this.root) {
-        if (currentNode == null) {
-            return null;
-        }
+    newNode.setParent(current);
 
-        while (currentNode.left != null) {
-            /*
-                     A
-                    /
-                  ...
-                  /
-                (X)  
-            */
-            currentNode = currentNode.left;
-        }
+    return newNode;
+  }
 
-        return currentNode;
+  /**
+   * @param {BinarySearchTreeNode=} current
+   */
+  getMin(current = this.getRoot()) {
+    if (current == null) {
+      return;
     }
 
-    /**
-     * @param {object} currentNode
-     * @returns {object} min
-     */
-    removeMin(currentNode = this.root) {
-        if (currentNode == null) {
-            return null;
-        }
-        let parentNode = null;
+    let left = current.getLeft();
 
-        while (currentNode.left != null) {
-            parentNode = currentNode;
-            currentNode = currentNode.left;
-        }
+    /*
+            A
+          /
+        ...
+        /
+      (X)
+    */
+    while (left != null) {
+      current = left;
 
-        return this.remove(currentNode.key, parentNode || this.root);
+      left = current.getLeft();
     }
 
-    /**
-     * @param {object} currentNode
-     * @returns {object} max
-     */
-    max(currentNode = this.root) {
-        if (currentNode == null) {
-            return null;
+    const min = current;
+
+    return min;
+  }
+
+  /**
+   * @param {BinarySearchTreeNode=} current
+   */
+  removeMin(current = this.getRoot()) {
+    if (current == null) {
+      return;
+    }
+
+    let parent = current;
+
+    let left = current.getLeft();
+
+    while (left != null) {
+      parent = current;
+
+      current = left;
+
+      left = current.getLeft();
+    }
+
+    const currentKey = current.getKey();
+
+    return this.remove(currentKey, parent);
+  }
+
+  /**
+   * @param {BinarySearchTreeNode=} current
+   */
+  getMax(current = this.getRoot()) {
+    if (current == null) {
+      return;
+    }
+
+    let right = current.getRight();
+
+    /*
+      A
+        \
+        ...
+          \
+          (X)
+    */
+    while (right != null) {
+      current = right;
+
+      right = current.getRight();
+    }
+
+    const max = current;
+
+    return max;
+  }
+
+  /**
+   * @param {BinarySearchTreeNode=} current
+   */
+  removeMax(current = this.getRoot()) {
+    if (current == null) {
+      return;
+    }
+
+    let parent = current;
+    let right = current.getRight();
+
+    while (right != null) {
+      parent = current;
+
+      current = right;
+
+      right = current.getRight();
+    }
+
+    const currentKey = current.getKey();
+
+    return this.remove(currentKey, parent);
+  }
+
+  /**
+   * @param {number} key
+   */
+  contains(key) {
+    return !!this.find(key);
+  }
+
+  /**
+   * @param {number} key
+   * @param {BinarySearchTreeNode=} current
+   */
+  find(key, current = this.getRoot()) {
+    if (current == null) {
+      return;
+    }
+
+    let currentKey = current.getKey();
+
+    while (currentKey !== key) {
+      if (key < currentKey) {
+        current = current.getLeft();
+      } else {
+        current = current.getRight();
+      }
+
+      if (current == null) {
+        break;
+      }
+
+      currentKey = current.getKey();
+    }
+
+    return current;
+  }
+
+  /**
+   * @param {number} key
+   * @param {BinarySearchTreeNode=} current
+   */
+  remove(key, current = this.getRoot()) {
+    if (current == null) {
+      return;
+    }
+
+    let parent = undefined;
+    let removed = undefined;
+
+    // Without function recursive calls for better perfomance
+    while (current != null) {
+      const currentKey = current.getKey();
+
+      const left = current.getLeft();
+      const right = current.getRight();
+
+      if (key < currentKey) {
+        parent = current;
+        current = left;
+      } else if (key > currentKey) {
+        parent = current;
+        current = right;
+      } else {
+        // key === currentKey
+        if (parent == null) {
+          // key is root
+          /*
+            (X)
+          */
+
+          removed = this.getRoot();
+
+          this.#clearRoot();
+
+          break;
         }
 
-        while (currentNode.right != null) {
-            /*
+        const parentKey = parent.getKey();
+
+        const currentDuplicationCount = current.getCount();
+
+        if (currentDuplicationCount > 0) {
+          // current key have duplications
+          /*
+            (X) - A
+          */
+          // Decrement duplicate counter
+          current.decrementCount();
+
+          const siblings = current.getSiblings();
+
+          const siblingNode = siblings.removeHead();
+
+          removed = /** @type {BinarySearchTreeNode} */ (siblingNode?.getValue());
+          break;
+        }
+
+        removed = current;
+
+        if (left == null && right == null) {
+          // No childrens - leaf
+          /*
                 A
-                 \
-                 ...
-                   \
-                   (X)  
-            */
-            currentNode = currentNode.right;
+              /   \
+            (X) or (X)
+          */
+
+          // Delete current in parent
+          if (currentKey < parentKey) {
+            parent.clearLeft();
+            break;
+          }
+
+          parent.clearRight();
+
+          break;
         }
 
-        return currentNode;
+        if (left == null && right != null) {
+          // No left children and right children exists
+          // Replace current with right in parent
+          if (currentKey < parentKey) {
+            parent.setLeft(right);
+          } else {
+            parent.setRight(right);
+          }
+
+          // Update right parent
+          right.setParent(parent);
+
+          break;
+        }
+
+        if (left != null && right == null) {
+          // Left children exists and no right children
+          // Replace current with left in parent
+          if (currentKey < parentKey) {
+            parent.setLeft(left);
+          } else {
+            parent.setRight(left);
+          }
+
+          // Update left parent
+          left.setParent(parent);
+
+          break;
+        }
+
+        if (left != null && right != null) {
+          /* 2 childrens - Find heir for replace current */
+          let heirParent = current;
+
+          // 1 step - Get right
+          /*
+            A
+            \
+            (X)
+          */
+          let heir = right;
+          let leftHeir = heir.getLeft();
+
+          // further step - Get left end
+          /*
+              A
+                \
+                B
+                /
+              ...
+              /
+            (X)
+          */
+          while (leftHeir != null) {
+            heirParent = heir;
+            heir = leftHeir;
+            leftHeir = heir.getLeft();
+          }
+
+          const heirKey = heir.getKey();
+
+          if (heirKey < parentKey) {
+            parent.setLeft(heir);
+          } else {
+            parent.setRight(heir);
+          }
+
+          // Update heir parent
+          heir.setParent(parent);
+
+          // Move current.left to heir.left
+          heir.setLeft(left);
+          // Update left parent
+          left.setParent(heir);
+
+          const heirRight = heir.getRight();
+
+          if (heirRight == null) {
+            // heir has no children (leaf) - Delete heir in heirParent
+            heirParent.clearRight();
+            break;
+          }
+
+          // heir has right - Replace heir with right in heirParent
+          /*
+            (X)
+              ^
+              \
+                A
+          */
+          const heirParentKey = heirParent.getKey();
+
+          if (heirKey < heirParentKey) {
+            heirParent.setLeft(heirRight);
+          } else {
+            heirParent.setRight(heirRight);
+          }
+          break;
+        }
+
+        break;
+      }
     }
 
-    /**
-     * @param {object} currentNode
-     * @returns {object} max
-     */
-    removeMax(currentNode = this.root) {
-        if (currentNode == null) {
-            return null;
-        }
-        let parentNode = null;
+    this.#decrementSize();
 
-        while (currentNode.right != null) {
-            parentNode = currentNode;
-            currentNode = currentNode.right;
-        }
+    return removed;
+  }
 
-        return this.remove(currentNode.key, parentNode || this.root);
-    }
 
-    /**
-     * @param {number} key
-     * @returns {boolean} contains
-     */
-    contains(key) {
-        return !!this.find(key);
-    }
-
-    /**
-     * @param {number} key
-     * @param {object} currentNode
-     * @returns {object} node
-     */
-    find(key, currentNode = this.root) {
-        if (currentNode == null) {
-            return null;
-        }
-
-        while (currentNode.key != key) {
-            if (key < currentNode.key) {
-                currentNode = currentNode.left;
-            } else {
-                currentNode = currentNode.right;
-            }
-
-            if (currentNode == null) {
-                return null;
-            }
-        }
-
-        return currentNode;
-    }
-
-    /**
-     * @param {number} key
-     * @param {object} currentNode
-     * @returns {object} removedNode
-     */
-    remove(key, currentNode = this.root) {
-        let parentNode = null;
-        if (currentNode == null) {
-            return null;
-        }
-
-        let removedNode = null;
-
-        // Without function recursive calls for better perfomance
-        while (true) {
-            if (key < currentNode.key) {
-                parentNode = currentNode;
-                currentNode = currentNode.left;
-            } else if (key > currentNode.key) {
-                parentNode = currentNode;
-                currentNode = currentNode.right;
-            } else {
-                // key === currentNode.key
-                if (currentNode.count) {
-                    // currentNode key have duplications
-                    /*
-                        (X) - A
-                    */
-                    // Decrement duplicate counter
-                    currentNode.count--;
-                    removedNode = currentNode.siblings.deleteHead().value;
-                    break;
-                }
-                removedNode = currentNode;
-
-                if (currentNode.left == null && currentNode.right == null) {
-                    // No childrens - leaf
-                    if (parentNode != null) {
-                        /*
-                                A
-                              /   \
-                            (X) or (X)
-                        */
-                        // Delete currentNode in parentNode
-                        if (currentNode.key < parentNode.key) {
-                            parentNode.left = null;
-                        } else {
-                            parentNode.right = null;
-                        }
-                    } else {
-                        // key is root
-                        /*
-                            (X)
-                        */
-                        this.root = null;
-                    }
-                    break;
-                }
-
-                if (currentNode.left == null) {
-                    // No left children
-                    // Replace currentNode with right in parentNode
-                    const right = currentNode.right;
-                    if (parentNode != null) {
-                        if (currentNode.key < parentNode.key) {
-                            parentNode.left = right;
-                        } else {
-                            parentNode.right = right;
-                        }
-                    } else {
-                        // currentNode === this.root && this.root.left == null
-                        /*
-                            (X)
-                              ^
-                               \
-                                A
-                        */
-                        // Replace this.root with right
-                        this.root = right;
-                    }
-                    // Update right parent
-                    right.parent = parentNode;
-                    break;
-                }
-
-                if (currentNode.right == null) {
-                    // No right children
-                    // Replace currentNode with left in parentNode
-                    const left = currentNode.left;
-                    if (parentNode != null) {
-                        if (currentNode.key < parentNode.key) {
-                            parentNode.left = left;
-                        } else {
-                            parentNode.right = left;
-                        }
-                    } else {
-                        // currentNode === this.root && this.root.right == null
-                        /*
-                              (X)
-                              ^
-                             /
-                            A
-                        */
-                        // Replace this.root with left
-                        this.root = left;
-                    }
-                    // Update left parent
-                    left.parent = parentNode;
-                    break;
-                }
-
-                /* 2 childrens - Find heirNode for replace currentNode */
-                let heirParentNode = currentNode;
-                // 1 step - Get right
-                /*
-                    A
-                     \
-                     (X)
-                */
-                let heirNode = currentNode.right;
-                // further steps - Get left
-                while (heirNode.left != null) {
-                    // Get left until lefts end
-                    /*
-                           A
-                            \
-                             B
-                            /
-                          ...
-                          /
-                        (X) 
-                    */
-                    heirParentNode = heirNode;
-                    heirNode = heirNode.left;
-                }
-
-                // Replace currentNode with heirNode in parentNode
-                if (parentNode != null) {
-                    if (heirNode.key < parentNode.key) {
-                        parentNode.left = heirNode;
-                    } else {
-                        parentNode.right = heirNode;
-                    }
-                } else {
-                    this.root = heirNode;
-                }
-                // Update heirNode parent
-                heirNode.parent = parentNode;
-
-                // Move currentNode.left to heirNode.left
-                heirNode.left = currentNode.left;
-                // Update left parent
-                heirNode.left.parent = heirNode;
-
-                if (heirNode.right) {
-                    // HeirNode has right - Replace heirNode with right in heirParentNode
-                    /*
-                        (X)
-                          ^
-                           \
-                            A
-                    */
-                    const right = heirNode.right;
-                    if (heirNode.key < heirParentNode.key) {
-                        heirParentNode.left = right;
-                    } else {
-                        heirParentNode.right = right;
-                    }
-                } else {
-                    // HeirNode has no children (leaf) - Delete heirNode in heirParentNode
-                    heirParentNode.right = null;
-                }
-                break;
-            }
-        }
-
-        this.size--;
-
-        return removedNode;
-    }
-
-    clear() {
-        this.root = null;
-        this.size = 0;
-    }
+  clear() {
+    this.#clearRoot();
+    this.#clearSize();
+  }
 }

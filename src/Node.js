@@ -1,27 +1,42 @@
-export class Node {
-    constructor(id, value) {
-        this.id = id;
-        this.value = value;
-    }
+/**
+ * @typedef {object} NodeProperties
+ * @property {number|string} id
+ * @property {unknown} value
+ * 
+ * @typedef {NodeProperties} NodeParams
+ */
+export default class Node {
+  #id;
+  #value;
 
-    /**
-     * @returns {number|string}
-     */
-    getId() {
-        return this.id;
-    }
+  /** @param {NodeProperties} params */
+  constructor({ id, value }) {
+    this.#id = id;
+    this.#value = value;
+  }
 
-    /**
-     * @returns {any}
-     */
-    getValue() {
-        return this.value;
-    }
+  /** @returns {NodeProperties} */
+  getProperties() {
+    return {
+      id: this.#id,
+      value: this.#value
+    };
+  }
 
-    /**
-     * @param {any} value 
-     */
-    setValue(value) {
-        this.value = value;
-    }
+
+  getId() {
+    return this.#id;
+  }
+
+
+  getValue() {
+    return this.#value;
+  }
+
+  /**
+   * @param {unknown} value 
+   */
+  setValue(value) {
+    this.#value = value;
+  }
 }

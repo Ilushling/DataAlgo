@@ -1,106 +1,138 @@
-import { DoublyLinkedListNode } from './DoublyLinkedListNode.js';
+import DoublyLinkedListNode from './DoublyLinkedListNode.js';
 
-export class DoublyLinkedList {
-    constructor() {
-        this.head = null;
-        this.tail = null;
-        this.count = 0;
+/**
+ * @typedef {object} DoublyLinkedListProperties
+ * @property {DoublyLinkedListNode=} head
+ * @property {DoublyLinkedListNode=} tail
+ * 
+ * @property {number} count
+ * 
+ * @typedef {DoublyLinkedListProperties} DoublyLinkedListParams
+ */
+export default class DoublyLinkedList {
+  #head;
+  #tail;
+
+  #count;
+
+  /** @param {DoublyLinkedListParams} params */
+  constructor({ head, tail }) {
+    this.#head = head;
+    this.#tail = tail;
+
+    this.#count = 0;
+  }
+
+  /**
+   * @param {unknown} value
+   */
+  prepend(value) {
+    const head = this.#head;
+    const tail = this.#tail;
+
+    const newNode = new DoublyLinkedListNode({ value, next: head });
+
+    this.#count++;
+
+    if (head != null) {
+      head.setPrevious(newNode);
     }
 
-    prepend(value) {
-        const newNode = new DoublyLinkedListNode(value, this.head);
-        
-        this.count++;
+    this.#head = newNode;
 
-        if (this.head) {
-            this.head.previous = newNode;
-        }
+    if (tail == null) {
+      this.#tail = newNode;
+    }
+  }
 
-        this.head = newNode;
+  /**
+   * @param {unknown} value
+   */
+  append(value) {
+    const head = this.#head;
 
-        if (this.tail == null) {
-            this.tail = newNode;
-        }
+    const newNode = new DoublyLinkedListNode({ value, next: head });
+
+    this.#count++;
+
+    if (this.#tail != null) {
+      this.#tail.setNext(newNode);
+
+      newNode.setPrevious(this.#tail);
     }
 
-    append(value) {
-        const newNode = new DoublyLinkedListNode(value, this.head);
+    this.#tail = newNode;
 
-        this.count++;
+    if (head == null) {
+      this.#head = newNode;
+    }
+  }
 
-        if (this.tail) {
-            this.tail.next = newNode;
-        }
+  /**
+   * @param {unknown} value
+   */
+  find(value) {
+    let currentNode = this.#head;
 
-        newNode.previous = this.tail;
+    while (currentNode != null) {
+      if (currentNode.getValue() === value) {
+        return currentNode;
+      }
 
-        this.tail = newNode;
-
-        if (this.head == null) {
-            this.head = newNode;
-        }
+      currentNode = currentNode.getNext();
     }
 
-    find(value) {
-        if (this.head == null) {
-            return null;
-        }
+    return;
+  }
 
-        let currentNode = this.head;
+  deleteTail() {
+    const tail = this.#tail;
 
-        while (currentNode) {
-            if (currentNode.value === value) {
-                return currentNode;
-            }
-
-            currentNode = currentNode.next;
-        }
-
-        return null;
+    if (tail == null) {
+      return;
     }
 
-    deleteTail() {
-        if (this.tail == null) {
-            return null;
-        }
+    this.#count--;
 
-        this.count--;
+    const deletedTail = tail;
 
-        const deletedTail = this.tail;
-
-        if (this.tail.previous) {
-            this.tail = this.tail.previous;
-            this.tail.next = null;
-        } else {
-            this.head = null;
-            this.tail = null;
-        }
-
-        return deletedTail;
+    if (tail.getPrevious()) {
+      this.#tail = tail.getPrevious();
+      tail.clearNext();
+    } else {
+      this.#head = undefined;
+      this.#tail = undefined;
     }
 
-    deleteHead() {
-        if (this.head == null) {
-            return null;
-        }
+    return deletedTail;
+  }
 
-        this.count--;
+  deleteHead() {
+    const head = this.#head;
 
-        const deletedHead = this.head;
-
-        if (this.head.next) {
-            this.head = this.head.next;
-            this.head.previous = null;
-        } else {
-            this.head = null;
-            this.tail = null;
-        }
-
-        return deletedHead;
+    if (head == null) {
+      return;
     }
 
-    clear() {
-        this.head = null;
-        this.count = 0;
+    this.#count--;
+
+    const deletedHead = head;
+
+    if (head.getNext()) {
+      this.#head = head.getNext();
+      head?.clearPrevious();
+    } else {
+      this.#head = undefined;
+      this.#tail = undefined;
     }
+
+    return deletedHead;
+  }
+
+  clear() {
+    this.#head = undefined;
+    this.#tail = undefined;
+
+    this.#count = 0;
+  }
 }

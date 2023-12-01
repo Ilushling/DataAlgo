@@ -1,19 +1,33 @@
-export class Edge {
-    constructor(value) {
-        this.value = value;
-    }
+/**
+ * @typedef {object} EdgeProperties
+ * @property {unknown} value
+ * 
+ * @typedef {EdgeProperties} EdgeParams
+ */
+export default class Edge {
+  #value;
 
-    /**
-     * @returns {any}
-     */
-    getValue() {
-        return this.value;
-    }
+  /** @param {EdgeParams} params */
+  constructor({ value }) {
+    this.#value = value;
+  }
 
-    /**
-     * @param {any} value 
-     */
-    setValue(value) {
-        this.value = value;
-    }
+  /** @returns {EdgeProperties} */
+  getProperties() {
+    return {
+      value: this.#value
+    };
+  }
+
+
+  getValue() {
+    return this.#value;
+  }
+
+  /**
+   * @param {unknown} value 
+   */
+  setValue(value) {
+    this.#value = value;
+  }
 }
