@@ -1,0 +1,37 @@
+{
+  "name": "dalgo",
+  "version": "1.0.0",
+  "description": "Data Structures and Algorithms",
+  "type": "module",
+  "author": "Ilushling",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test"
+  },
+  "keywords": [
+    "data",
+    "structures",
+    "algorithms",
+    "node",
+    "edge",
+    "list",
+    "linked",
+    "tree",
+    "graph",
+    "binary",
+    "search",
+    "bts",
+    "avl"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ilushling/DataAlgo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Ilushling/DataAlgo/issues"
+  },
+  "homepage": "https://github.com/Ilushling/DataAlgo#readme",
+  "devDependencies": {
+    "@types/node": "^20.10.1"
+  }
+}
