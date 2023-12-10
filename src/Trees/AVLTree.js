@@ -55,31 +55,78 @@ export default class AvlTree {
 
     const balanceFactor = this.getBalanceFactor(node);
 
+    let newRoot = node;
+
     if (balanceFactor > 1) {
       const left = node.getLeft();
 
-      // Left is bigger - Left Left (LL)
-      if (left != null && this.getBalanceFactor(left) < 0) {
-        // Right of Left is bigger - Left Right (LR)
-        node = this.#rotateLeft(left);
+      if (left != null) {
+        const leftBalanceFactor = this.getBalanceFactor(left);
+
+        // Left is bigger - Left Left (LL)
+        if (leftBalanceFactor < 0) {
+          // Right of Left is bigger - Left Right (LR)
+          newRoot = this.#rotateLeft(left);
+
+          /*
+                3           3
+               /           /
+              1     ->    2
+               \         /
+                2       1
+          */
+        }
       }
 
-      return this.#rotateRight(node);
+      newRoot = this.#rotateRight(node);
+
+      /*
+            3        2
+           /        / \
+          1    ->  1   3
+           \
+            2
+      */
+
+      return newRoot;
     }
 
     if (balanceFactor < -1) {
       const right = node.getRight();
+      let newRoot;
 
-      // Right is bigger - Right Right (RR)
-      if (right != null && this.getBalanceFactor(right) > 0) {
-        // Left of Right is bigger - Right Left (RL)
-        node = this.#rotateRight(right);
+      if (right != null) {
+        const rightBalanceFactor = this.getBalanceFactor(right);
+
+        // Right is bigger - Right Right (RR)
+        if (rightBalanceFactor > 0) {
+          // Left of Right is bigger - Right Left (RL)
+          newRoot = this.#rotateRight(right);
+
+          /*
+              1        1
+               \        \
+                3  ->    2
+               /          \ 
+              2            3
+          */
+        }
       }
 
-      return this.#rotateLeft(node);
+      newRoot = this.#rotateLeft(node);
+
+      /*
+          1             2
+           \          /   \
+            2    ->  1     3
+             \
+              3
+      */
+
+      return newRoot;
     }
 
-    return node;
+    return newRoot;
   }
 
   /**
@@ -127,21 +174,28 @@ export default class AvlTree {
     T2 - left of right (Y) moves to right (Y)
   */
   /**
-   * @param {BinarySearchTreeNode} node
+   * @param {BinarySearchTreeNode} node - Z
    */
-  #rotateLeft(/* Z */ node) {
-    const right = node.getRight(); // Y
+  #rotateLeft(node) {
+    // Y
+    const right = node.getRight();
     if (right == null) {
       return node;
     }
 
-    const rightLeft = right.getLeft(); // T2
-    if (rightLeft == null) {
-      return node;
-    }
+    // T2
+    const rightLeft = right.getLeft();
 
-    node.setRight(rightLeft); // Y (right) replace with T2 (rightLeft)
-    right.setLeft(node); // T2 (rightLeft) replace with Z
+    if (rightLeft == null) {
+      node.clearRight();
+    } else {
+      // Y (right) replace with T2 (rightLeft)
+      node.setRight(rightLeft);
+      // Z will be parent of T2
+      rightLeft.setParent(node);
+    }
+    // T2 (rightLeft) replace with Z
+    right.setLeft(node);
 
     // Z replace with Y (right)
     let parentNode = node.getParent();
@@ -158,15 +212,17 @@ export default class AvlTree {
         parentNode.setRight(right);
       }
 
-      right.setParent(parentNode); // Z parent will be parent of Y
+      // Z parent will be parent of Y
+      right.setParent(parentNode);
     }
 
-    node.setParent(right); // Y will be parent of Z
+    // Y will be parent of Z
+    node.setParent(right);
 
-    rightLeft.setParent(node); // Z will be parent of T2
-
-    this.#updateHeight(node); // Z now is left
-    this.#updateHeight(right); // Y now is root
+    // Z now is left
+    this.#updateHeight(node);
+    // Y now is root
+    this.#updateHeight(right);
 
     return right;
   }
@@ -186,21 +242,28 @@ export default class AvlTree {
       T3 - right of left (Y) moves to left (Y)
   */
   /**
-   * @param {BinarySearchTreeNode} node
+   * @param {BinarySearchTreeNode} node - Z
    */
-  #rotateRight(/* Z */ node) {
-    const left = node.getLeft(); // Y
+  #rotateRight(node) {
+    // Y
+    const left = node.getLeft();
     if (left == null) {
       return node;
     }
 
-    const leftRight = left.getRight(); // T3
+    // T3
+    const leftRight = left.getRight();
     if (leftRight == null) {
-      return node;
+      node.clearLeft();
+    } else {
+      // Y (left) replace with T3 (leftRight)
+      node.setLeft(leftRight);
+      // Z will be parent of T3
+      leftRight.setParent(node);
     }
 
-    node.setLeft(leftRight); // Y (left) replace with T3 (leftRight)
-    left.setRight(node); // T3 (leftRight) replace with Z
+    // T3 (leftRight) replace with Z
+    left.setRight(node);
 
     // Z replace with Y (left)
     let parentNode = node.getParent();
@@ -213,15 +276,17 @@ export default class AvlTree {
       } else {
         parentNode.setRight(left);
       }
-      left.setParent(parentNode); // Z parent will be parent of Y
+      // Z parent will be parent of Y
+      left.setParent(parentNode);
     }
 
-    node.setParent(left); // Y will be parent of Z
+    // Y will be parent of Z
+    node.setParent(left);
 
-    leftRight.setParent(node); // Z will be parent of T3
-
-    this.#updateHeight(node); // Z now is right
-    this.#updateHeight(left); // Y now is root
+    // Z now is right
+    this.#updateHeight(node);
+    // Y now is root
+    this.#updateHeight(left);
 
     return left;
   }
