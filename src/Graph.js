@@ -2,13 +2,22 @@ import Node from './Node.js';
 import Edge from './Edge.js';
 
 /**
- * @typedef {Map<number|string, Map<number|string, Edge>>} Edges
+ * @typedef {number|string} Id
+ */
+
+/**
+ * @typedef {Map<Id, Node>} Nodes
+ */
+
+/**
+ * @typedef {Map<Id, Edge>} Edges
+ * @typedef {Map<Id, Edges>} NodeEdges
  */
 
 /**
  * @typedef {object} GraphProperties
- * @property {Map<number|string, Node>=} nodes
- * @property {Edges=} edges
+ * @property {Nodes=} nodes
+ * @property {NodeEdges=} edges
  * 
  * @typedef {GraphProperties} GraphParams
  */
@@ -29,7 +38,7 @@ export default class Graph {
   }
 
   /**
-   * @param {number|string} nodeId
+   * @param {Id} nodeId
    * @param {unknown} value
    */
   addNode(nodeId, value) {
@@ -46,7 +55,7 @@ export default class Graph {
   }
 
   /**
-   * @param {number|string} nodeId
+   * @param {Id} nodeId
    */
   getNode(nodeId) {
     return this.#nodes.get(nodeId);
@@ -57,7 +66,7 @@ export default class Graph {
   }
 
   /**
-   * @param {number|string} nodeId
+   * @param {Id} nodeId
    */
   hasNode(nodeId) {
     return this.#nodes.has(nodeId);
@@ -68,7 +77,7 @@ export default class Graph {
   }
 
   /**
-   * @param {number|string} nodeId
+   * @param {Id} nodeId
    * @param {Node} value
    */
   setNode(nodeId, value) {
@@ -76,7 +85,7 @@ export default class Graph {
   }
 
   /**
-   * @param {Map<number|string, Node>} nodes
+   * @param {Nodes} nodes
    */
   setAllNodes(nodes) {
     this.#nodes = nodes;
@@ -84,8 +93,8 @@ export default class Graph {
 
 
   /**
-   * @param {number|string} sourceNodeId
-   * @param {number|string} targetNodeId
+   * @param {Id} sourceNodeId
+   * @param {Id} targetNodeId
    * @param {unknown} value
    * @param {boolean} undirected
    */
@@ -103,6 +112,7 @@ export default class Graph {
     if (undirected) {
       this.setEdge(targetNodeId, sourceNodeId, new Edge({ value }));
       this.#edgesCount++;
+
       return [this.getEdge(sourceNodeId, targetNodeId), this.getEdge(targetNodeId, sourceNodeId)];
     }
 
@@ -110,8 +120,8 @@ export default class Graph {
   }
 
   /**
-   * @param {number|string} sourceNodeId
-   * @param {number|string} targetNodeId
+   * @param {Id} sourceNodeId
+   * @param {Id} targetNodeId
    */
   getEdge(sourceNodeId, targetNodeId) {
     const sourceEdges = this.getEdges(sourceNodeId);
@@ -123,7 +133,7 @@ export default class Graph {
   }
 
   /**
-   * @param {number|string} nodeId
+   * @param {Id} nodeId
    */
   getEdges(nodeId) {
     return this.#edges.get(nodeId);
@@ -134,8 +144,8 @@ export default class Graph {
   }
 
   /**
-   * @param {number|string} sourceNodeId
-   * @param {number|string} targetNodeId
+   * @param {Id} sourceNodeId
+   * @param {Id} targetNodeId
    */
   hasEdge(sourceNodeId, targetNodeId) {
     const sourceEdges = this.getEdges(sourceNodeId);
@@ -147,7 +157,7 @@ export default class Graph {
   }
 
   /**
-   * @param {number|string} nodeId
+   * @param {Id} nodeId
    */
   hasEdges(nodeId) {
     return this.#edges.has(nodeId);
@@ -158,8 +168,8 @@ export default class Graph {
   }
 
   /**
-   * @param {number|string} sourceNodeId
-   * @param {number|string} targetNodeId
+   * @param {Id} sourceNodeId
+   * @param {Id} targetNodeId
    * @param {Edge} edge
    */
   setEdge(sourceNodeId, targetNodeId, edge) {
@@ -169,15 +179,15 @@ export default class Graph {
 
     const sourceEdges = this.getEdges(sourceNodeId);
     if (sourceEdges == null) {
-      return false;
+      return;
     }
 
     sourceEdges.set(targetNodeId, edge);
   }
 
   /**
-   * @param {number|string} nodeId
-   * @param {Map<number|string, Edge>} edges
+   * @param {Id} nodeId
+   * @param {Edges} edges
    */
   setEdges(nodeId, edges) {
     if (this.hasEdges(nodeId)) {
@@ -192,15 +202,15 @@ export default class Graph {
   }
 
   /**
-   * @param {Edges} edges
+   * @param {NodeEdges} edges
    */
   setAllEdges(edges) {
     this.#edges = edges;
   }
 
   /**
-   * @param {number|string} sourceNodeId
-   * @param {number|string} targetNodeId
+   * @param {Id} sourceNodeId
+   * @param {Id} targetNodeId
    */
   removeEdge(sourceNodeId, targetNodeId) {
     const sourceEdges = this.getEdges(sourceNodeId);
@@ -216,7 +226,7 @@ export default class Graph {
   }
 
   /**
-   * @param {number|string} nodeId
+   * @param {Id} nodeId
    */
   removeEdges(nodeId) {
     const edges = this.getEdges(nodeId);
@@ -234,6 +244,7 @@ export default class Graph {
   clear() {
     this.#nodes.clear();
     this.#edges.clear();
+
     this.#edgesCount = 0;
   }
 }
