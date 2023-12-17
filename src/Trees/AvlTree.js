@@ -93,7 +93,6 @@ export default class AvlTree {
 
     if (balanceFactor < -1) {
       const right = node.getRight();
-      let newRoot;
 
       if (right != null) {
         const rightBalanceFactor = this.getBalanceFactor(right);
@@ -107,7 +106,7 @@ export default class AvlTree {
               1        1
                \        \
                 3  ->    2
-               /          \ 
+               /          \
               2            3
           */
         }
@@ -161,7 +160,7 @@ export default class AvlTree {
 
   /*
     Right Right (RR)
-          Z                 Y 
+          Z                 Y
          / \              /   \
         T1  Y            Z     X
            / \     ->   / \   / \
@@ -185,7 +184,6 @@ export default class AvlTree {
 
     // T2
     const rightLeft = right.getLeft();
-
     if (rightLeft == null) {
       node.clearRight();
     } else {
@@ -194,11 +192,12 @@ export default class AvlTree {
       // Z will be parent of T2
       rightLeft.setParent(node);
     }
+
     // T2 (rightLeft) replace with Z
     right.setLeft(node);
 
     // Z replace with Y (right)
-    let parentNode = node.getParent();
+    const parentNode = node.getParent();
     if (parentNode == null) {
       this.#tree.setRoot(right);
       right.clearParent();
@@ -266,16 +265,20 @@ export default class AvlTree {
     left.setRight(node);
 
     // Z replace with Y (left)
-    let parentNode = node.getParent();
+    const parentNode = node.getParent();
     if (parentNode == null) {
       this.#tree.setRoot(left);
       left.clearParent();
     } else {
-      if (left.getKey() < parentNode.getKey()) {
+      const leftKey = left.getKey();
+      const parentKey = parentNode.getKey();
+
+      if (leftKey < parentKey) {
         parentNode.setLeft(left);
       } else {
         parentNode.setRight(left);
       }
+
       // Z parent will be parent of Y
       left.setParent(parentNode);
     }
@@ -325,6 +328,7 @@ export default class AvlTree {
     }
 
     currentNode = removedNode.getParent();
+
     while (currentNode != null) {
       this.balance(currentNode);
 
@@ -346,7 +350,7 @@ export default class AvlTree {
     //     return;
     // }
 
-    // let currentNode = min.getParent();
+    // currentNode = min.getParent();
     // while (currentNode != null) {
     //     this.balance(currentNode);
 
@@ -368,7 +372,7 @@ export default class AvlTree {
     //     return;
     // }
 
-    // let currentNode = max.getParent();
+    // currentNode = max.getParent();
     // while (currentNode != null) {
     //     this.balance(currentNode);
 

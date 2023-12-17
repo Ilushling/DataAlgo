@@ -113,7 +113,10 @@ export default class Graph {
       this.setEdge(targetNodeId, sourceNodeId, new Edge({ value }));
       this.#edgesCount++;
 
-      return [this.getEdge(sourceNodeId, targetNodeId), this.getEdge(targetNodeId, sourceNodeId)];
+      return [
+        this.getEdge(sourceNodeId, targetNodeId),
+        this.getEdge(targetNodeId, sourceNodeId)
+      ];
     }
 
     return [this.getEdge(sourceNodeId, targetNodeId)];

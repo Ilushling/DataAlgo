@@ -4,11 +4,12 @@ import BinarySearchTreeNode from './BinarySearchTreeNode.js';
  * @typedef {object} BinarySearchTreeProperties
  * @property {BinarySearchTreeNode=} root
  * @property {number=} size
- * 
+ *
  * @typedef {BinarySearchTreeProperties} BinarySearchTreeParams
  */
 export default class BinarySearchTree {
   #root;
+
   #size;
 
   /** @param {BinarySearchTreeParams} params */
@@ -77,7 +78,7 @@ export default class BinarySearchTree {
 
     this.#incrementSize();
 
-    let parent = undefined;
+    let parent;
 
     // Without function recursive calls for better perfomance
     while (current != null) {
@@ -302,8 +303,8 @@ export default class BinarySearchTree {
       return;
     }
 
-    let parent = undefined;
-    let removed = undefined;
+    let parent;
+    let removed;
 
     // Without function recursive calls for better perfomance
     while (current != null) {

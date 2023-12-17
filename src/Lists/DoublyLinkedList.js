@@ -81,8 +81,6 @@ export default class DoublyLinkedList {
 
       currentNode = currentNode.getNext();
     }
-
-    return;
   }
 
   deleteTail() {

@@ -77,7 +77,7 @@ export default class LinkedList {
     let currentNode = this.#head;
 
     if (currentNode == null) {
-      return null;
+      return;
     }
 
     while (currentNode != null) {
@@ -87,8 +87,6 @@ export default class LinkedList {
 
       currentNode = currentNode.getNext();
     }
-
-    return;
   }
 
 
