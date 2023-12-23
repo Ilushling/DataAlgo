@@ -5,6 +5,7 @@
   "type": "module",
   "author": "Ilushling",
   "license": "MIT",
+  "main": "index.js",
   "scripts": {
     "test": "node --test"
   },
@@ -32,6 +33,6 @@
   },
   "homepage": "https://github.com/Ilushling/DataAlgo#readme",
   "devDependencies": {
-    "@types/node": "^20.10.1"
+    "@types/node": "^20.10.5"
   }
 }
